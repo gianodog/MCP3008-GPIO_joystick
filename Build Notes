@@ -1,0 +1,101 @@
+I used Rasmushauschild's 3d models to print the Portable Raspberry Pi game console case and included much of what he suggested in my build.
+
+I didn't use all of the same parts so it took some efforts to get them all to work with the Raspberry Pi and wanted to share my experience.
+
+For example, I didn't use a teensy and instead opting to keep the USBs all free and use GPIO for all the inputs.  The buttons were wired directly to the GPIO but I used an MCP3008 analog/digital converter chip to wire the joystick via the SPI pins on the GPIO, so I had to write a gamepad driver to achieve this.
+
+TO DO:
+Program joystick driver as a kernel module & using interrupts rather than polling (as done in my python driver) to conserve CPU resources
+use https://github.com/recalbox/mk_arcade_joystick_rpi as a guide
+Replace 3D printed button covers with nice buttons from SNES controller (trying http://www.ebay.com/itm/302194133526 $5.79)
+Modify 3D case design to 
+widen by about ~0.5 cm to accommodate 6600 mAh battery from Adafruit https://www.adafruit.com/products/353 ($29.50) 
+eliminate openings on right hand side (not used in my build)
+Reprint case in better resolution
+Wire up LED on power switch (considering 3.3V on RPi GPIO to + and GND on RPi GPIO to -)
+
+Here is my parts list:
+Case - printed from Rasmushauschild's 3d models on my Prusa Mk2
+Button covers (Dpad, ABXY, Start, Select, Menu, Underside Buttons) - printed from Rasmushauschild's 3d models on my Prusa Mk2
+Buttons - CO-RODE Tact Button Switch 6x6x5mm Pack of 100 - https://www.amazon.com/gp/product/B00W0YUV1W ($6.80/100; 13 used = ~$0.88)
+Joystick - PSP 1000 Joystick Analog Stick Assembly Replacement - https://www.amazon.com/gp/product/B00170JDZU ($1.86)
+Display - BW 3.5 Inch TFT LCD Monitor for Car / Automobile - https://www.amazon.com/gp/product/B0045IIZKU ($18.95)
+Speakers - Ringer Speaker (Set of 2) for Nintendo DS Lite - https://www.amazon.com/gp/product/B0071AF9F8 ($7.94)
+Circuit Board - PIXNOR 7*9 cm Solder Finished Prototype PCB for DIY Circuit Board Breadboard Pack of 10 https://www.amazon.com/gp/product/B01DKAC7BG ($7.99/10; ~2 used = ~$1.60)
+Audio Amplifier - ADAFRUIT MONO 2.5W CLASS D AUDIO AMPLIFIER - PAM8302 - https://www.adafruit.com/product/2130 ($3.95 + shipping)
+Thumbwheel Potentiometer - 10K Ohm Thumbwheel Potentiometer Pack of 5 - http://www.ebay.com/itm/381143599904 ($0.99/5 - 1 used = $0.20)
+Battery - Lithium Ion Polymer Battery - 3.7v 2500mAh - https://www.adafruit.com/products/328 ($14.95 + shipping)
+Power Supply - PowerBoost 1000 Charger - Rechargeable 5V Lipo USB Boost @ 1A - 1000C - https://www.adafruit.com/products/2465 ($19.95 + shipping)
+Power Button - Rugged Metal On/Off Switch with White LED Ring - 16mm White On/Off - https://www.adafruit.com/products/917 ($4.95 + shipping)
+Jumper Wires - Premium Female/Female Jumper Wires - 40 x 6" - https://www.adafruit.com/products/266 ($3.95/40 + shipping; ~12 used = $1.19 + shipping)
+A/D Converter - MCP3008 - 8-Channel 10-Bit ADC With SPI Interface - https://www.adafruit.com/products/856 (out of stock ($3.75 + shipping)) - http://www.ebay.com/itm/111254096078 ($3.88 + $2.98 shipping = $6.86)
+Raspberry Pi 3 Model B 2016 Single Board Computer with High Performance Heatsink Set - https://www.amazon.com/gp/product/B01CMC50S0 ($37.99)
+SD Card - ADATA Premier 16GB microSDHC/SDXC UHS-I U1 Memory Card with Adapter (AUSDH16GUICL10-RA1) - https://www.amazon.com/gp/product/B00BSRETVK ($4.99 add on item)
+
+Total cost of all parts $142.11 + Shipping (~$14) = $156.11
+Approximate cost of unused parts ~$15.86
+
+Approximate cost of other materials (30 AWG wire, solder, screws, hot glue) = $3
+Approximate cost of 3D parts = $30
+Approximate Grand Total = $189
+
+
+Wiring Instructions
+
+Digital Controls
+Wire Buttons (Dpad, X, Y, A, B, Start, Select, Menu, L Shoulder, R Shoulder) to GPIO Input Pins (& GND GPIO Pin)  (GPIO pins identified in driver file)
+
+Power
+Wire PowerBoost 1000 C output to 5V & GND GPIO Pins (pins 2, 6)
+Wire Power Button Contacts so that EN & GND Pins on PowerBoost 1000 C are shorted when button is not pressed and open when button is pressed (contacts C1 & NC1 (2,4) on button)
+Connect Battery JST to PowerBoost 1000 C battery JST 
+
+Sound
+Position thumbwheel so it passes through slot on left side of case, used to control speaker volume
+Wire pin 1 of thumbwheel to GND GPIO Pin on RPi
+Wire pin 3 of thumbwheel to pads X, Y on bottom of RPi (note - converts headphone jack to mono audio)
+Wire pin 2 of thumbwheel to audio+ input of PAM8302  
+Wire PAM8302 ground to pad Z on bottom of RPi
+Wire PAM8302 power to 3.3V GPIO Pin on RPi (pin 1)
+Wire PAM8302 audio- input to PAM8302 ground 
+Turn PAM8302 amplifier to maximum
+Wire Output of PAM8302 to speakers
+
+Video
+On Display circuit board, remove power converter chip
+Wire 5V pin from power converter chip spot on display circuit board to 5V GPIO Pin on RPi (pin 4)
+Wire yellow wire from Display to pad X on bottom of Raspberry Pi
+Wire black (ground) wire from Display to pad X on bottom of Raspberry Pi
+
+Joystick
+Wire pins 16-9 of MCP3008 (VDD, VREF, AGND, CLK, DOUT, DIN, CS/SHDN, DGND) to SPI GPIO Pins on RPi (pins 17, 19, 21, 23, 25, 26) (see https://learn.adafruit.com/raspberry-pi-analog-to-digital-converters/mcp3008)
+Wire Joystick +V to 3.3 V GPIO Pin on RPi (or VDD/VREF Pins 16/15 on MCP3008)
+Wire Joystick ground to GND GPIO Pin on RPi
+Wire Joystick x-axis to CH0 of MCP3008 (Pin 1)
+Wire Joystick y-axis to CH2 of MCP3008 (Pin 3)
+
+Software 
+RetroPie - https://retropie.org.uk/
+
+Driver for Buttons and Joystick (Python)
+
+Install Adafruit MCP3008 Python Library
+https://learn.adafruit.com/raspberry-pi-analog-to-digital-converters/mcp3008
+
+Make sure uinput is installed
+sudo apt-get install uinput
+
+Driver Program Source Code
+https://github.com/gianodog/MCP3008-GPIO_joystick/blob/master/MCP3008-GPIO_joystick.py
+
+Run Driver Program on Startup
+edit /etc/rc.local to add:
+python MCP3008-GPIO_joystick.py
+
+Links I found useful during driver programming
+https://github.com/tuomasjjrasanen/python-uinput/blob/master/examples/joystick.py
+https://github.com/cpswan/Python/blob/master/rpi-gpio-jstk.py
+http://blog.thestateofme.com/2012/08/10/raspberry-pi-gpio-joystick/
+http://www.hertaville.com/interfacing-an-spi-adc-mcp3008-chip-to-the-raspberry-pi-using-c.html
+
+Special thanks to the efforts of Rasmushauschild, Adafruit, Chris Swan, hertaville.com
