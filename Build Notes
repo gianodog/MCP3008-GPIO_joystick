@@ -52,8 +52,8 @@ Connect Battery JST to PowerBoost 1000 C battery JST
 
 Sound
 Position thumbwheel so it passes through slot on left side of case, used to control speaker volume
-Wire pin 1 of thumbwheel to GND GPIO Pin on RPi
-Wire pin 3 of thumbwheel to pads X, Y on bottom of RPi (note - converts headphone jack to mono audio)
+Wire pin 1 of thumbwheel to pad 6 on bottom of RPi (or other GND point)
+Wire pin 3 of thumbwheel to pads 25, 26 on bottom of RPi (note - converts headphone jack to mono audio)
 Wire pin 2 of thumbwheel to audio+ input of PAM8302  
 Wire PAM8302 ground to pad Z on bottom of RPi
 Wire PAM8302 power to 3.3V GPIO Pin on RPi (pin 1)
@@ -64,8 +64,8 @@ Wire Output of PAM8302 to speakers
 Video
 On Display circuit board, remove power converter chip
 Wire 5V pin from power converter chip spot on display circuit board to 5V GPIO Pin on RPi (pin 4)
-Wire yellow wire from Display to pad X on bottom of Raspberry Pi
-Wire black (ground) wire from Display to pad X on bottom of Raspberry Pi
+Wire yellow wire from Display to pad 24 on bottom of RPi
+Wire black (ground) wire from Display to pad 6 on bottom of RPi (or other GND point)
 
 Joystick
 Wire pins 16-9 of MCP3008 (VDD, VREF, AGND, CLK, DOUT, DIN, CS/SHDN, DGND) to SPI GPIO Pins on RPi (pins 17, 19, 21, 23, 25, 26) (see https://learn.adafruit.com/raspberry-pi-analog-to-digital-converters/mcp3008)
